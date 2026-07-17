@@ -1,0 +1,26 @@
+{
+  "backend": "opengl",
+  "mode": "depth",
+  "source": "/private/var/folders/l5/ffs09lqx2hvfg87y7463b6hm0000gn/T/robot_rendering_cosmos3_oenba3uh/input.mp4",
+  "source_result": {
+    "backend": "mujoco_opengl",
+    "output": "/private/var/folders/l5/ffs09lqx2hvfg87y7463b6hm0000gn/T/robot_rendering_cosmos3_oenba3uh/source_keyframe.png",
+    "seconds": 0.4769335000019055,
+    "sha256": "8785516ba9e1901e1f340d23bc3bdcf18030e9f9f9c9d6d021408c9377100d39",
+    "width": 1280,
+    "height": 720
+  },
+  "conditioning": {
+    "scene": "fr3_renderer_evaluation",
+    "width": 1280,
+    "height": 720,
+    "frames": 121,
+    "fps": 24,
+    "controls": {
+      "depth": "/private/var/folders/l5/ffs09lqx2hvfg87y7463b6hm0000gn/T/robot_rendering_cosmos3_oenba3uh/depth.mp4"
+    },
+    "depth_encoding": "inverse metric depth, fixed 1.5m..30m, near=white",
+    "segmentation_encoding": "black background, gray floor, blue robot, prop colors",
+    "manifest": "/private/var/folders/l5/ffs09lqx2hvfg87y7463b6hm0000gn/T/robot_rendering_cosmos3_oenba3uh/conditioning.json"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "controls": {
+    "depth": "/private/var/folders/l5/ffs09lqx2hvfg87y7463b6hm0000gn/T/robot_rendering_cosmos3_oenba3uh/depth.mp4"
+  },
+  "depth_encoding": "inverse metric depth, fixed 1.5m..30m, near=white",
+  "fps": 24,
+  "frames": 121,
+  "height": 720,
+  "scene": "fr3_renderer_evaluation",
+  "segmentation_encoding": "black background, gray floor, blue robot, prop colors",
+  "width": 1280
+}

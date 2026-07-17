@@ -1,0 +1,38 @@
+[project]
+name = "robot-rendering"
+version = "0.1.0"
+description = "Compare rendering pipelines on one MuJoCo FR3 scene"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "imageio>=2.37.2,<3",
+  "imageio-ffmpeg>=0.6.0,<0.7",
+  "mujoco==3.10.0",
+  "mujoco-warp==3.10.0.1",
+  "numpy>=2.2,<3",
+  "pillow>=11.3,<13",
+  "pygame-ce>=2.5.7,<3",
+  "usd-core==26.5",
+  "warp-lang==1.15.0",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.4,<10",
+  "ruff>=0.12,<1",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+extend-exclude = [".venv", "build", "outputs", "third_party"]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
