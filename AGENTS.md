@@ -7,8 +7,8 @@ scene. Keep renderer inputs equivalent so that output differences reflect render
 quality, not different geometry, animation, cameras, materials, or lighting.
 
 The canonical environment is assembled with MuJoCo `MjSpec` in `scene.py`. The regular
-backends are MuJoCo OpenGL, MuJoCo Warp, Blender Cycles, and remote NVIDIA ovrtx.
-Cosmos 3 is an optional generative post-process, not another renderer.
+backends are MuJoCo OpenGL, MuJoCo Warp, Blender Cycles, remote NVIDIA ovrtx, and
+remote Mitsuba 3. Cosmos 3 is an optional generative post-process, not another renderer.
 
 ## Development environment
 
@@ -17,8 +17,10 @@ Cosmos 3 is an optional generative post-process, not another renderer.
 - Blender is an external application and runs `render_blender.py` with its bundled
   version-matched Python API. Do not install a mismatched `bpy` wheel into the uv
   environment.
-- Remote ovrtx work uses the SSH host `l4`. Remote benchmarks and Cosmos 3 use `g4`.
-  Keep model caches, downloaded runtimes, and generated build products outside Git.
+- Linux CUDA/RTX rendering, remote benchmarks, and Cosmos 3 use a configurable SSH host.
+  Documentation and tests must use the neutral `render-host` placeholder and must not
+  expose maintainer infrastructure. Keep model caches, downloaded runtimes, and generated
+  build products outside Git.
 
 ## Architecture and coding rules
 
@@ -36,6 +38,9 @@ Cosmos 3 is an optional generative post-process, not another renderer.
 - Keep Blender subprocesses and renderer workers isolated. Do not move Blender rendering
   into the uv interpreter.
 - Keep labels and frame timing synchronized in tiled comparison videos.
+- Treat ovrtx `pathtraced` and `realtime` as explicit modes of one backend. When
+  path-traced RGB is requested with auxiliary outputs, keep RGB on the converged
+  path-tracing product and use a synchronized real-time annotation product for AOVs.
 
 ## Renderer parity
 

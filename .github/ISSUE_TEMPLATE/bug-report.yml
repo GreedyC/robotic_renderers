@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a reproducible defect in a renderer or workflow
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include credentials or private host details. Use the security policy for
+        vulnerabilities.
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Backend
+      options:
+        - MuJoCo OpenGL
+        - MuJoCo Warp
+        - Blender
+        - NVIDIA ovrtx
+        - Mitsuba
+        - Cosmos 3
+        - Tiled/orchestration
+        - Packaging/documentation
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include the smallest command and relevant output.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, architecture, Python, renderer version, GPU/driver, and remote setup.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Additional evidence
+      description: Logs, artifact metadata, or a minimal image/video. Remove sensitive data.

@@ -1,0 +1,28 @@
+name: Feature request
+description: Propose an improvement or renderer integration
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What workflow or comparison is difficult today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the desired interface and behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: parity
+    attributes:
+      label: Renderer parity
+      description: How would this preserve common geometry, cameras, materials, and lighting?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered

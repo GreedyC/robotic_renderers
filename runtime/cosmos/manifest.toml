@@ -1,0 +1,19 @@
+[runtime]
+name = "cosmos3-super"
+platform = "linux-x86_64"
+python = "3.12"
+torch-backend = "cu130"
+minimum-gpu-count = 4
+default-gpu-ids = [0, 1, 2, 3]
+gpu-selection-environment = "ROBOTIC_RENDERERS_COSMOS_GPU_IDS"
+topology-guidance = "Select GPUs on one NUMA node when possible."
+
+[python-packages]
+vllm = "0.26.0"
+vllm-omni-repository = "https://github.com/vllm-project/vllm-omni.git"
+vllm-omni-commit = "39663d52872019fb0eb74bed8f1e811190486b0f"
+
+[model]
+repository = "nvidia/Cosmos3-Super"
+revision = "e0262be9d8f7586bc24c069a2aed2b665bdff266"
+precision = "BF16"

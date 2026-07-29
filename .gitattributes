@@ -1,0 +1,20 @@
+* text=auto
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.npz binary
+*.usd binary
+*.usdc binary
+
+# New videos use Git LFS. Existing examples are exempt so adding this policy does not
+# rewrite repository history; migrate them intentionally in a dedicated future change.
+videos/**/*.mp4 filter=lfs diff=lfs merge=lfs -text
+videos/all_tiled.mp4 -filter -diff -merge -text
+videos/blender.mp4 -filter -diff -merge -text
+videos/cosmos3_super_depth.mp4 -filter -diff -merge -text
+videos/cosmos3_super_depth_conditioning/depth.mp4 -filter -diff -merge -text
+videos/cosmos3_super_depth_conditioning/input.mp4 -filter -diff -merge -text
+videos/mujoco_opengl.mp4 -filter -diff -merge -text
+videos/mujoco_warp.mp4 -filter -diff -merge -text
+videos/ovrtx.mp4 -filter -diff -merge -text

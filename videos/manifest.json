@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "scene": "fr3_renderer_evaluation",
+  "resolution": [1280, 720],
+  "video_fps": 24,
+  "recording_duration_seconds": 30.0,
+  "trajectory": "canonical close two-orbit multi-view sequence",
+  "runtime_versions": {
+    "blender": "5.1.2",
+    "cosmos_model": "nvidia/Cosmos3-Super",
+    "cosmos_model_revision": "e0262be9d8f7586bc24c069a2aed2b665bdff266",
+    "mitsuba": "3.9.0",
+    "mujoco": "3.10.0",
+    "mujoco_warp": "3.10.0.1",
+    "ovrtx": "0.4.0.346409",
+    "ovstage": "0.1.0.346039"
+  },
+  "artifacts": {
+    "all_tiled.mp4": {
+      "backend": "all",
+      "bytes": 42976244,
+      "duration": 30.0,
+      "fps": 24.0,
+      "frames": 720,
+      "sha256": "6b6b1aa0e0e7d4e07418a48d5b648663e69e02f044fca7a68d3f9aa1c9167984",
+      "size": [3840, 1440]
+    },
+    "blender.mp4": {
+      "backend": "blender",
+      "bytes": 14218182,
+      "duration": 30.0,
+      "fps": 24.0,
+      "frames": 720,
+      "sha256": "395232c95f0af5011e534235934aa3debc4ad073503478a41c5acdc59d3c88cd",
+      "size": [1280, 720]
+    },
+    "cosmos3_super_depth.mp4": {
+      "backend": "cosmos3",
+      "bytes": 6875993,
+      "duration": 5.04,
+      "fps": 24.0,
+      "frames": 121,
+      "sha256": "8b9f39f21f516b929852fa78024fcd28e07b32d71ab66b87758ab1dbfc821cb5",
+      "size": [1280, 720]
+    },
+    "mitsuba.mp4": {
+      "backend": "mitsuba",
+      "bytes": 21335110,
+      "duration": 30.0,
+      "fps": 24.0,
+      "frames": 720,
+      "sha256": "e9c149e72d984ccdaaf86cf4b06886d55757a083c9a885c40f9ab7fdb8f580ce",
+      "size": [1280, 720]
+    },
+    "mujoco_opengl.mp4": {
+      "backend": "opengl",
+      "bytes": 13145196,
+      "duration": 30.0,
+      "fps": 24.0,
+      "frames": 720,
+      "sha256": "967ce186e704040667dd8cfbb08771196a2f69764d279b1edc884ca73fb2194c",
+      "size": [1280, 720]
+    },
+    "mujoco_warp.mp4": {
+      "backend": "warp",
+      "bytes": 17702587,
+      "duration": 30.0,
+      "fps": 24.0,
+      "frames": 720,
+      "sha256": "ec6f768712a22d135f5eb84f2fd087c2cbd4c3bca0c629542e3e21c37b7797e2",
+      "size": [1280, 720]
+    },
+    "ovrtx.mp4": {
+      "backend": "ovrtx",
+      "bytes": 20155363,
+      "duration": 30.0,
+      "fps": 24.0,
+      "frames": 720,
+      "sha256": "6dff6e076ea8f62ecc281fdbdd2820914c6c5dd9217139eb6b3cfad89642ca05",
+      "size": [1280, 720]
+    }
+  }
+}

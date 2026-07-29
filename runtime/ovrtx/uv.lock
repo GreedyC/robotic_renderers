@@ -1,0 +1,50 @@
+version = 1
+revision = 3
+requires-python = "==3.12.*"
+resolution-markers = [
+    "platform_machine == 'x86_64' and sys_platform == 'linux'",
+]
+supported-markers = [
+    "platform_machine == 'x86_64' and sys_platform == 'linux'",
+]
+
+[[package]]
+name = "numpy"
+version = "2.5.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/22/fd/89965aa4ac08c74998539fcbf24fa3540f3e15237fbeb6bcf9c908f4aade/numpy-2.5.1.tar.gz", hash = "sha256:a48a113e6afea91f5608793bafa7ef2ad481fefbda87ec5069f483de61cb9fa3", size = 20755553, upload-time = "2026-07-04T17:08:00.933Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b8/a9/6e73d68500f80773f65f0654ea932019d6694329a0eb0ed0533de38df376/numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:59fda5e192b570217ec2580c96f00e9a7e12ef6866a900eb089b62c1a32545ca", size = 16672469, upload-time = "2026-07-04T17:06:24.064Z" },
+    { url = "https://files.pythonhosted.org/packages/83/d0/a39b2fbcde9cb17a1dac678f254b33a6336298af9df338824c685425d5e8/numpy-2.5.1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:e824c2acf8862052246be5a44c15da1777940c60d010dd2aab897824d9c430f9", size = 18431940, upload-time = "2026-07-04T17:06:29.521Z" },
+]
+
+[[package]]
+name = "ovrtx"
+version = "0.4.0.346409"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ef/e3/516037b64a164721ab0b5baa8609d4e169066a736421bf4ec85be0bc9607/ovrtx-0.4.0.346409.tar.gz", hash = "sha256:aaf864c11062f4124e1c4675155ac1a7919cb5c94b14d5d354de5eea35c8dc2c", size = 671, upload-time = "2026-07-17T16:46:10.999Z" }
+
+[[package]]
+name = "ovstage"
+version = "0.1.0.346039"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7d/73/4dcb1de47907cedf3747db05a0a769ac40540abacc7597bca4bf00c454a3/ovstage-0.1.0.346039-py3-none-manylinux_2_35_x86_64.whl", hash = "sha256:6e96453f48f1e3177b28ac554f39728d22f3143958ad687986235cb5eb87f919", size = 64306930, upload-time = "2026-07-16T23:27:49.889Z" },
+]
+
+[[package]]
+name = "robotic-renderers-ovrtx-runtime"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "numpy", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "ovrtx", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "ovstage", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "numpy", specifier = "==2.5.1" },
+    { name = "ovrtx", specifier = "==0.4.0.346409" },
+    { name = "ovstage", specifier = "==0.1.0.346039" },
+]

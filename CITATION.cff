@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use Robotic Renderers in research, please cite the software."
+title: "Robotic Renderers"
+type: software
+authors:
+  - family-names: "Kelestemur"
+    given-names: "Tarik"
+repository-code: "https://github.com/tkelestemur/robotic_renderers"
+url: "https://github.com/tkelestemur/robotic_renderers"
+license: "Apache-2.0"
+version: "0.1.0"

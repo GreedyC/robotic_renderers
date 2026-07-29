@@ -1,0 +1,16 @@
+[project]
+name = "robotic-renderers-ovrtx-runtime"
+version = "0.1.0"
+description = "Pinned Linux/RTX runtime for the robotic-renderers ovrtx backend"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy==2.5.1",
+  "ovrtx==0.4.0.346409",
+  "ovstage==0.1.0.346039",
+]
+
+[tool.uv]
+package = false
+environments = [
+  "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]

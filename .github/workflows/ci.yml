@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  portable:
+    name: Python 3.12 / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14]
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: true
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          version: "0.12.0"
+          enable-cache: true
+
+      - name: Install locked environment
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Run portable tests
+        run: >-
+          uv run pytest -q
+          --cov=robotic_renderers
+          --cov-report=term-missing:skip-covered
+          -m "not integration and not gpu and not remote"
+
+  package:
+    name: Build and install wheel
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          version: "0.12.0"
+          enable-cache: true
+
+      - name: Build wheel and source distribution
+        run: uv build
+
+      - name: Install wheel in a clean environment
+        run: |
+          uv venv --python 3.12 /tmp/robotic-renderers-smoke
+          uv pip install --python /tmp/robotic-renderers-smoke/bin/python dist/*.whl
+          /tmp/robotic-renderers-smoke/bin/robotic-renderers --help
+          /tmp/robotic-renderers-smoke/bin/python - <<'PY'
+          from importlib import metadata, resources
+
+          import robotic_renderers
+          from robotic_renderers.scene import scene_summary
+
+          assert metadata.version("robotic-renderers")
+          assets = resources.files(robotic_renderers).joinpath("data", "franka_fr3")
+          assert assets.joinpath("fr3.xml").is_file()
+          assert assets.joinpath("LICENSE").is_file()
+          runtimes = resources.files(robotic_renderers).joinpath("data", "runtime")
+          assert runtimes.joinpath("ovrtx", "uv.lock").is_file()
+          assert runtimes.joinpath("mitsuba", "uv.lock").is_file()
+          assert runtimes.joinpath("warp", "uv.lock").is_file()
+          assert scene_summary(160, 90)["camera"] == "evaluation_camera"
+          PY
+
+      - name: Install source distribution in a clean environment
+        run: |
+          uv venv --python 3.12 /tmp/robotic-renderers-sdist-smoke
+          uv pip install --python /tmp/robotic-renderers-sdist-smoke/bin/python dist/*.tar.gz
+          /tmp/robotic-renderers-sdist-smoke/bin/robotic-renderers scene \
+            --width 160 --height 90
+
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: robotic-renderers-distributions
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+          if-no-files-found: error
