@@ -7,6 +7,10 @@ use [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Use a published `setup-uv` release tag so GitHub Actions can initialize CI jobs.
+
 ### Changed
 
 - Replaced maintainer-specific remote host aliases and hardware fixtures with the
