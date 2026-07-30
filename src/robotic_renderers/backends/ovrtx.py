@@ -315,9 +315,6 @@ mv "$incoming/runtime" "$root/runtime"
 rmdir "$incoming"
 rm -rf "$old"
 
-# Remove files created by releases before the locked-runtime layout.
-rm -rf "$root/vendor"
-rm -f "$root/render_ovrtx.py" "$root/ovrtx_runtime_pyproject.toml"
 echo "official locked ovrtx runtime import succeeded"
 nvidia-smi --query-gpu=name,driver_version --format=csv,noheader | sed -n '1p'
 """

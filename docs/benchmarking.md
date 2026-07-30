@@ -14,7 +14,7 @@ uv run robotic-renderers benchmark --backend all --host render-host \
 The multi-GPU scaling harness runs the same 1280x720 scene:
 
 ```bash
-uv run python benchmark_fps.py --host render-host
+uv run robotic-renderers-throughput --host render-host
 ```
 
 ## Measurement contract

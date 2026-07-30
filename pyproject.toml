@@ -63,6 +63,7 @@ warp = [
 
 [project.scripts]
 robotic-renderers = "robotic_renderers.cli:main"
+robotic-renderers-throughput = "robotic_renderers.benchmarks.throughput:main"
 
 [project.urls]
 Changelog = "https://github.com/tkelestemur/robotic_renderers/blob/main/CHANGELOG.md"
@@ -96,19 +97,8 @@ include = [
   "/README.md",
   "/SECURITY.md",
   "/THIRD_PARTY.md",
-  "/backend_registry.py",
-  "/benchmark_fps.py",
-  "/benchmarks",
-  "/defaults.py",
   "/docs",
-  "/geometry.py",
-  "/main.py",
-  "/process_utils.py",
-  "/remote.py",
-  "/render_*.py",
   "/runtime",
-  "/scene.py",
-  "/scene_bundle.py",
   "/src",
   "/tests",
   "/third_party/mujoco_menagerie",
@@ -127,7 +117,7 @@ packages = ["src/robotic_renderers"]
 
 [tool.pytest.ini_options]
 addopts = "--strict-markers"
-pythonpath = ["src", "."]
+pythonpath = ["src"]
 testpaths = ["tests"]
 markers = [
   "gpu: requires a CUDA/RTX device",

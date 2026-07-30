@@ -92,7 +92,6 @@ def test_mitsuba_batch_command_pins_the_requested_gpu():
     assert "cuda_ad_rgb" in command
     assert "PYTHONPATH=" in command
     assert "-m robotic_renderers.backends.mitsuba __worker" in command
-    assert "render_mitsuba.py" not in command
 
 
 def test_mitsuba_rejects_oversized_remote_error_before_allocating(monkeypatch):
@@ -142,7 +141,6 @@ def test_mitsuba_benchmark_command_uses_the_packaged_worker_module():
     assert "CUDA_VISIBLE_DEVICES=2" in command
     assert "PYTHONPATH=" in command
     assert "-m robotic_renderers.backends.mitsuba __worker" in command
-    assert "render_mitsuba.py" not in command
 
 
 def _fake_worker_process(return_code=None, stdout="", stderr=""):

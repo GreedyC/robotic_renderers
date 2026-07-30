@@ -13,6 +13,8 @@ use [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Removed the legacy root-level Python compatibility modules. Package imports and the
+  installed console commands are now the only supported interfaces.
 - Replaced maintainer-specific remote host aliases and hardware fixtures with the
   configurable, neutral `render-host` placeholder.
 - Updated the main environment and every renderer runtime to the latest stable package

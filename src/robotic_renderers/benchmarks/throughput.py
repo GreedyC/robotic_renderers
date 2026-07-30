@@ -27,12 +27,13 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from robotic_renderers.defaults import DEFAULT_RENDER_HOST
-from robotic_renderers.remote import rsync_remote, ssh_command, validate_ssh_host
+from robotic_renderers.remote import ssh_command, validate_ssh_host
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path.cwd().resolve()
 REMOTE_ROOT = ".cache/robot_rendering"
 OVRTX_REMOTE_ROOT = "code/robot_rendering_ovrtx"
 MITSUBA_REMOTE_ROOT = "code/robot_rendering_mitsuba"
+THROUGHPUT_MODULE = "robotic_renderers.benchmarks.throughput"
 RESULT_MAGIC = "ROBOT_RENDERING_FPS_RESULT="
 BLENDER_VERSION = "5.1.2"
 BLENDER_ARCHIVE = f"blender-{BLENDER_VERSION}-linux-x64.tar.xz"
@@ -40,10 +41,6 @@ BLENDER_URL = "https://mirror.clarkson.edu/blender/release/Blender5.1/" + BLENDE
 BLENDER_SHA256 = "aaccb355f50183979b698bcce7467103a76261b5fa59f4972295842662a285fb"
 BLENDER_REMOTE = f".cache/blender/blender-{BLENDER_VERSION}-linux-x64/blender"
 BACKENDS = ("opengl", "warp", "blender", "ovrtx", "mitsuba")
-
-
-def _run(command: list[str], **kwargs) -> subprocess.CompletedProcess:
-    return subprocess.run(command, check=True, **kwargs)
 
 
 def _write_text_atomic(path: Path, value: str) -> Path:
@@ -124,19 +121,20 @@ def _extract_result(output: str) -> dict[str, object]:
 def _remote_uv_command(arguments: list[str]) -> str:
     command = [
         ".venv/bin/python",
-        "benchmark_fps.py",
+        "-m",
+        THROUGHPUT_MODULE,
         *arguments,
     ]
     return f'cd "$HOME/{REMOTE_ROOT}" && PYTHONPATH="$PWD/source/src" {shlex.join(command)}'
 
 
 def _remote_ovrtx_command(arguments: list[str]) -> str:
-    command = [".venv/bin/python", "benchmark_fps.py", *arguments]
+    command = [".venv/bin/python", "-m", THROUGHPUT_MODULE, *arguments]
     return f'cd "$HOME/{OVRTX_REMOTE_ROOT}" && PYTHONPATH="$PWD/source" {shlex.join(command)}'
 
 
 def _remote_mitsuba_command(arguments: list[str]) -> str:
-    command = [".venv/bin/python", "benchmark_fps.py", *arguments]
+    command = [".venv/bin/python", "-m", THROUGHPUT_MODULE, *arguments]
     return f'cd "$HOME/{MITSUBA_REMOTE_ROOT}" && PYTHONPATH="$PWD/source" {shlex.join(command)}'
 
 
@@ -192,30 +190,6 @@ def setup_remote(host: str) -> dict[str, object]:
     ovrtx_result = ovrtx.setup_remote(host)
     mitsuba_result = mitsuba.setup_remote(host)
     blender = _setup_blender(host)
-    _run(
-        [
-            "rsync",
-            "-az",
-            str(Path(__file__).resolve()),
-            rsync_remote(host, f"~/{REMOTE_ROOT}/benchmark_fps.py"),
-        ]
-    )
-    _run(
-        [
-            "rsync",
-            "-az",
-            str(Path(__file__).resolve()),
-            rsync_remote(host, f"~/{OVRTX_REMOTE_ROOT}/benchmark_fps.py"),
-        ]
-    )
-    _run(
-        [
-            "rsync",
-            "-az",
-            str(Path(__file__).resolve()),
-            rsync_remote(host, f"~/{MITSUBA_REMOTE_ROOT}/benchmark_fps.py"),
-        ]
-    )
     return {
         "warp_project": warp_result,
         "ovrtx": ovrtx_result,
@@ -611,14 +585,6 @@ def _blender_worker(arguments: list[str]) -> int:
 
     import bpy
 
-    script_directory = Path(__file__).resolve().parent
-    for candidate in (
-        script_directory / "source" / "src",
-        script_directory.parent / "src",
-    ):
-        if candidate.is_dir():
-            sys.path.insert(0, str(candidate))
-            break
     from robotic_renderers.backends import blender
 
     manifest = blender._worker_build_scene(Path(args.manifest).resolve(), args.samples, live=False)

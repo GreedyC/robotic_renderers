@@ -3,17 +3,19 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from benchmarks import throughput as benchmark_fps
+
+from robotic_renderers.backends import mitsuba, mujoco_warp, ovrtx
+from robotic_renderers.benchmarks import throughput
 
 
 def test_benchmark_bundle_destination_is_confined_to_build_root(
     monkeypatch,
     tmp_path: Path,
 ):
-    monkeypatch.setattr(benchmark_fps, "ROOT", tmp_path)
+    monkeypatch.setattr(throughput, "ROOT", tmp_path)
     valid = tmp_path / "build" / "fps_benchmark_trial"
 
-    assert benchmark_fps._validated_benchmark_destination(valid) == valid.resolve()
+    assert throughput._validated_benchmark_destination(valid) == valid.resolve()
 
     for invalid in (
         tmp_path,
@@ -22,11 +24,11 @@ def test_benchmark_bundle_destination_is_confined_to_build_root(
         tmp_path.parent / "fps_benchmark_escape",
     ):
         with pytest.raises(ValueError, match="fps_benchmark"):
-            benchmark_fps._validated_benchmark_destination(invalid)
+            throughput._validated_benchmark_destination(invalid)
 
 
 def test_benchmark_parser_defaults_are_portable_and_full_resolution():
-    args = benchmark_fps.build_parser().parse_args([])
+    args = throughput.build_parser().parse_args([])
 
     assert args.host == "render-host"
     assert (args.width, args.height) == (1280, 720)
@@ -59,7 +61,7 @@ def test_ovrtx_multi_environment_stage_preserves_per_environment_resolution(
         )
     )
 
-    stage_path, render_product = benchmark_fps._write_ovrtx_multi_env_stage(bundle_path, 4)
+    stage_path, render_product = throughput._write_ovrtx_multi_env_stage(bundle_path, 4)
     stage = stage_path.read_text()
 
     assert render_product == "/Render/MultiEnvironment"
@@ -70,10 +72,10 @@ def test_ovrtx_multi_environment_stage_preserves_per_environment_resolution(
 
 
 def test_mitsuba_workers_are_distributed_round_robin_across_selected_gpus():
-    assert benchmark_fps._mitsuba_worker_gpus(7, [1, 3, 5]) == [1, 3, 5, 1, 3, 5, 1]
+    assert throughput._mitsuba_worker_gpus(7, [1, 3, 5]) == [1, 3, 5, 1, 3, 5, 1]
 
     with pytest.raises(ValueError, match="At least one GPU"):
-        benchmark_fps._mitsuba_worker_gpus(1, [])
+        throughput._mitsuba_worker_gpus(1, [])
 
 
 def test_mitsuba_guided_denoiser_receives_rgb_albedo_and_normals():
@@ -86,7 +88,7 @@ def test_mitsuba_guided_denoiser_receives_rgb_albedo_and_normals():
         received["normals"] = normals
         return rgb + albedo + normals
 
-    denoised = benchmark_fps._mitsuba_denoise_rgb(image, denoiser)
+    denoised = throughput._mitsuba_denoise_rgb(image, denoiser)
 
     np.testing.assert_array_equal(received["rgb"], image[:, :, :3])
     np.testing.assert_array_equal(received["albedo"], image[:, :, 3:6])
@@ -96,7 +98,7 @@ def test_mitsuba_guided_denoiser_receives_rgb_albedo_and_normals():
         image[:, :, :3] + image[:, :, 3:6] + image[:, :, 6:9],
     )
     np.testing.assert_array_equal(
-        benchmark_fps._mitsuba_denoise_rgb(image, None),
+        throughput._mitsuba_denoise_rgb(image, None),
         image[:, :, :3],
     )
 
@@ -129,9 +131,7 @@ def test_mitsuba_summary_reports_render_readback_and_throughput_fps():
         },
     ]
 
-    summary = benchmark_fps._summarize_mitsuba_results(
-        results, workers=3, frames=4, wall_seconds=4.25
-    )
+    summary = throughput._summarize_mitsuba_results(results, workers=3, frames=4, wall_seconds=4.25)
 
     assert summary["worker_gpus"] == [3, 1, 3]
     assert summary["gpus_used"] == [1, 3]
@@ -143,50 +143,58 @@ def test_mitsuba_summary_reports_render_readback_and_throughput_fps():
     assert summary["checksums"] == [11, 22, 33]
 
 
-def test_setup_remote_sets_up_and_syncs_mitsuba_worker(monkeypatch):
-    import render_mitsuba
-    import render_mujoco_warp
-    import render_ovrtx
-
-    calls = []
+def test_setup_remote_sets_up_each_runtime(monkeypatch):
     monkeypatch.setattr(
-        render_mujoco_warp,
+        mujoco_warp,
         "setup_remote",
         lambda host, force: {"host": host, "force": force},
     )
+    monkeypatch.setattr(ovrtx, "setup_remote", lambda host: {"backend": "ovrtx", "host": host})
     monkeypatch.setattr(
-        render_ovrtx, "setup_remote", lambda host: {"backend": "ovrtx", "host": host}
-    )
-    monkeypatch.setattr(
-        render_mitsuba,
+        mitsuba,
         "setup_remote",
         lambda host: {"backend": "mitsuba", "host": host},
     )
     monkeypatch.setattr(
-        benchmark_fps,
+        throughput,
         "_setup_blender",
         lambda host: {"backend": "blender", "host": host},
     )
-    monkeypatch.setattr(
-        benchmark_fps,
-        "_run",
-        lambda command, **kwargs: calls.append(command),
-    )
 
-    setup = benchmark_fps.setup_remote("render-host")
+    setup = throughput.setup_remote("render-host")
 
+    assert setup["warp_project"] == {"host": "render-host", "force": True}
+    assert setup["ovrtx"] == {"backend": "ovrtx", "host": "render-host"}
     assert setup["mitsuba"] == {"backend": "mitsuba", "host": "render-host"}
-    assert any(
-        command[-1] == "render-host:~/.cache/robot_rendering/benchmark_fps.py" for command in calls
-    )
-    assert any(
-        command[-1] == "render-host:~/code/robot_rendering_mitsuba/benchmark_fps.py"
-        for command in calls
-    )
+    assert setup["blender"] == {"backend": "blender", "host": "render-host"}
+
+
+@pytest.mark.parametrize(
+    ("command_factory", "working_directory", "pythonpath"),
+    [
+        (throughput._remote_uv_command, ".cache/robot_rendering", "$PWD/source/src"),
+        (throughput._remote_ovrtx_command, "code/robot_rendering_ovrtx", "$PWD/source"),
+        (
+            throughput._remote_mitsuba_command,
+            "code/robot_rendering_mitsuba",
+            "$PWD/source",
+        ),
+    ],
+)
+def test_remote_benchmark_commands_use_packaged_module(
+    command_factory,
+    working_directory,
+    pythonpath,
+):
+    command = command_factory(["__hardware"])
+
+    assert f'cd "$HOME/{working_directory}"' in command
+    assert f'PYTHONPATH="{pythonpath}"' in command
+    assert ".venv/bin/python -m robotic_renderers.benchmarks.throughput __hardware" in command
 
 
 def test_run_suite_routes_mitsuba_sweep_to_remote_runtime(monkeypatch):
-    args = benchmark_fps.build_parser().parse_args(
+    args = throughput.build_parser().parse_args(
         [
             "--backends",
             "mitsuba",
@@ -232,9 +240,9 @@ def test_run_suite_routes_mitsuba_sweep_to_remote_runtime(monkeypatch):
             "checksums": list(range(workers)),
         }
 
-    monkeypatch.setattr(benchmark_fps, "_remote_result", fake_remote_result)
+    monkeypatch.setattr(throughput, "_remote_result", fake_remote_result)
 
-    result = benchmark_fps.run_suite(args)
+    result = throughput.run_suite(args)
 
     trials = result["results"]["mitsuba"]["trials"]
     assert [trial["workers"] for trial in trials] == [2, 4]
@@ -306,7 +314,7 @@ def test_markdown_report_ranks_best_render_fps():
         },
     }
 
-    report = benchmark_fps.format_markdown(result)
+    report = throughput.format_markdown(result)
 
     assert report.index("| 1 | warp") < report.index("| 2 | opengl")
     assert "1280×720 per environment" in report

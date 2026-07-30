@@ -147,7 +147,6 @@ def test_tiled_worker_commands_route_mode_only_to_ovrtx(tmp_path: Path):
     assert all(
         command[1:4] == ["-m", "robotic_renderers", "record"] for command in commands.values()
     )
-    assert all("main.py" not in command for command in commands.values())
 
 
 def test_tiled_local_warp_command_does_not_pass_an_ignored_host(tmp_path: Path):

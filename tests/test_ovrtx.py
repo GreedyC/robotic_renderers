@@ -629,7 +629,6 @@ def test_ovrtx_remote_command_uses_the_packaged_worker_module():
 
     assert "PYTHONPATH=" in command
     assert "-m robotic_renderers.backends.ovrtx __worker" in command
-    assert "render_ovrtx.py" not in command
 
 
 def test_ovrtx_rejects_oversized_aov_payload_before_allocating(monkeypatch):

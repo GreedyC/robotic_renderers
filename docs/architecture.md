@@ -7,7 +7,7 @@ trajectory, checker scale, sky, and key/fill/rim lighting.
 ## Data flow
 
 ```text
-scene.py
+robotic_renderers.scene
   ├─ MuJoCo model/data ──> OpenGL
   │                    └─> MuJoCo Warp
   └─ neutral scene bundle
@@ -42,15 +42,14 @@ src/robotic_renderers/
   processes.py           local subprocess lifecycle
   registry.py            backend metadata and functional dispatch
   backends/              adapters, scene translations, and isolated worker entry points
+  benchmarks/            specialized throughput harnesses
   workflows/             tiled video and Cosmos orchestration
-benchmarks/
-  throughput.py          opt-in multi-GPU scaling harness
 runtime/
   */                     frozen renderer-specific remote environments
 ```
 
-Top-level compatibility scripts delegate to the package. New code should import the
-package or use the `robotic-renderers` command.
+There are no top-level Python entry points. Import `robotic_renderers` or use the
+installed `robotic-renderers` and `robotic-renderers-throughput` commands.
 
 ## Backend contract
 

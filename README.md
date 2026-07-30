@@ -40,9 +40,6 @@ Repository `uv sync` installs the `dev` and `renderers` dependency groups by def
 Package consumers can keep a smaller environment and select `robotic-renderers[warp]`,
 `robotic-renderers[ovrtx]`, or `robotic-renderers[all]` as needed.
 
-The root `main.py` remains a compatibility wrapper, so
-`uv run python main.py status` is equivalent.
-
 Blender runs as an external application with its bundled, version-matched Python API.
 Do not install an unrelated `bpy` wheel into the uv environment. Remote renderers use
 separate uv environments and keep downloaded runtimes and caches outside Git.
@@ -193,7 +190,7 @@ uv run robotic-renderers benchmark --backend all --host render-host \
 The multi-GPU scaling harness remains available:
 
 ```bash
-uv run python benchmark_fps.py --host render-host
+uv run robotic-renderers-throughput --host render-host
 ```
 
 Results depend on renderer settings and do not imply equal perceptual quality. Read the

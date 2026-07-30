@@ -22,7 +22,8 @@ environments on a configured Linux RTX host.
 ## Making a change
 
 1. Open an issue for substantial behavior or architecture changes.
-2. Keep `scene.py` as the source of truth for renderer-visible scene data.
+2. Keep `src/robotic_renderers/scene.py` as the source of truth for renderer-visible
+   scene data.
 3. Prefer small module-level functions and avoid application classes.
 4. Keep backend adapters aligned with the common functional interface.
 5. Add tests for behavior changes and update the relevant documentation.

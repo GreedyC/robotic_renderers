@@ -1,1 +1,0 @@
-"""Standalone performance benchmark programs."""

@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from robotic_renderers import processes as process_utils
+from robotic_renderers import processes
 
 
 def _fake_process(return_code):
@@ -26,9 +26,9 @@ def test_wait_fail_fast_terminates_and_reaps_pending_siblings(monkeypatch):
         if process is hanging:
             state["return_code"] = -signal_number
 
-    monkeypatch.setattr(process_utils, "_signal_process", signal_process)
+    monkeypatch.setattr(processes, "_signal_process", signal_process)
 
-    return_codes = process_utils.wait_fail_fast(
+    return_codes = processes.wait_fail_fast(
         {"failed": failed, "hanging": hanging},
         poll_interval=0.01,
         grace_seconds=0.01,

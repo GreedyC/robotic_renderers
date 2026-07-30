@@ -5,14 +5,14 @@ import numpy as np
 import pytest
 
 import robotic_renderers
-from robotic_renderers import cli as main
+from robotic_renderers import cli
 from robotic_renderers.backends import blender as render_blender
 from robotic_renderers.backends import mujoco_opengl as render_mujoco_opengl
 
 
 def test_required_function_api_exists():
-    for backend in main.BACKEND_MODULES:
-        module = main._module(backend)
+    for backend in cli.BACKEND_MODULES:
+        module = cli._module(backend)
         for function_name in (
             "backend_status",
             "render_frame",
@@ -40,6 +40,12 @@ def test_application_sources_do_not_define_classes():
     for source_path in root.rglob("*.py"):
         tree = ast.parse(source_path.read_text())
         assert not [node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
+
+
+def test_repository_has_no_root_level_python_modules():
+    root = Path(__file__).resolve().parents[1]
+
+    assert list(root.glob("*.py")) == []
 
 
 @pytest.mark.integration

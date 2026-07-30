@@ -33,7 +33,7 @@ def test_scene_bundle_contains_shared_scene_inputs(tmp_path: Path):
     assert any(name.startswith("vertices_") for name in source_geometry.files)
 
 
-def test_blender_bundle_is_a_scene_bundle_compatibility_wrapper(tmp_path: Path):
+def test_blender_bundle_uses_the_canonical_scene_bundle(tmp_path: Path):
     manifest_path = render_blender.prepare_blender_bundle(
         tmp_path,
         times=[0.0],

@@ -190,8 +190,6 @@ mv "$incoming/runtime" "$root/runtime"
 rmdir "$incoming"
 rm -rf "$old"
 
-rm -f "$root/render_mitsuba.py" "$root/mitsuba_runtime_pyproject.toml" \
-  "$root/pyproject.toml" "$root/uv.lock"
 nvidia-smi --query-gpu=name,driver_version --format=csv,noheader | sed -n '1p'
 """
 
