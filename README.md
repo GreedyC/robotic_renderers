@@ -1,18 +1,27 @@
 # Robotic Renderers
 
-Robotic Renderers compares five rendering pipelines on one deterministic Franka FR3
-scene:
+[![CI](https://github.com/tkelestemur/robotic_renderers/actions/workflows/ci.yml/badge.svg)](https://github.com/tkelestemur/robotic_renderers/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/tkelestemur/robotic_renderers)](https://github.com/tkelestemur/robotic_renderers/releases/latest)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/downloads/)
+[![Apache-2.0](https://img.shields.io/github/license/tkelestemur/robotic_renderers)](LICENSE)
 
-- MuJoCo OpenGL
-- MuJoCo Warp
-- Blender Cycles
-- NVIDIA ovrtx, in real-time or converged path-traced mode
-- Mitsuba 3 CUDA/OptiX
+Robotic Renderers makes renderer comparisons reproducible: one deterministic Franka FR3
+scene, five rendering pipelines, and a shared contract for geometry, motion, materials,
+lighting, cameras, and timing.
 
 [![Autoplaying tiled comparison of all five rendering backends](videos/all_tiled_preview.gif)](videos/all_tiled.mp4)
 
-The 30-second preview loops automatically. Select it to open the full-resolution
-3840x1440 comparison video.
+The preview loops automatically. Select it to open the full 30-second, 3840x1440
+comparison video.
+
+## Why this project exists
+
+- **Fair comparisons:** every backend receives the same scene content and analytical
+  camera trajectory.
+- **Useful outputs:** render stills, live views, MP4 recordings, synchronized tiled
+  comparisons, benchmarks, and ovrtx AOVs through one CLI.
+- **Reproducible environments:** Python dependencies, remote renderer runtimes, and the
+  MuJoCo Menagerie source revision are pinned and documented.
 
 Cosmos 3 is available as an optional generative post-process. It is not treated as a
 renderer or a source of simulator ground truth.
@@ -23,16 +32,39 @@ intent, 0.33 m floor tiles, gradient sky, and directional-key/point-fill/spot-ri
 rig. The default 1280x720 video follows one analytical 30-second camera trajectory with
 two orbits, close inspection passes, establishing views, and changing camera height.
 
-See the [architecture](https://github.com/tkelestemur/robotic_renderers/blob/main/docs/architecture.md)
-and [backend parity](https://github.com/tkelestemur/robotic_renderers/blob/main/docs/backend-parity.md)
-guides for the comparison contract.
+[Release v0.1.0](https://github.com/tkelestemur/robotic_renderers/releases/tag/v0.1.0)
+· [Documentation](docs/)
+· [Architecture](docs/architecture.md)
+· [Renderer parity](docs/backend-parity.md)
+· [Roadmap and feedback](https://github.com/tkelestemur/robotic_renderers/discussions)
 
-## Requirements and installation
+## Backend support
+
+| Backend | Execution | Main outputs |
+| --- | --- | --- |
+| MuJoCo OpenGL | Local macOS or Linux | Live, still, video, benchmark |
+| MuJoCo Warp | Local Apple-silicon CPU or remote Linux CUDA | Live, still, video, benchmark |
+| Blender Cycles | External Blender on macOS or Linux | Live, still, video, benchmark |
+| NVIDIA ovrtx | Remote Linux RTX | Real-time/path-traced RGB, AOVs, video, benchmark |
+| Mitsuba 3 | Remote Linux CUDA/OptiX | Live, still, video, benchmark |
+
+## Try the local reference in 60 seconds
+
+With Python 3.12 and [uv](https://docs.astral.sh/uv/) installed, render directly from the
+versioned `v0.1.0` source tag without cloning the repository:
+
+```bash
+uvx --from git+https://github.com/tkelestemur/robotic_renderers.git@v0.1.0 \
+  robotic-renderers still --backend opengl --output opengl.png
+```
+
+## Full installation
 
 - Python 3.12
 - [uv](https://docs.astral.sh/uv/)
-- Blender for the Blender backend
-- an SSH-accessible Linux CUDA/RTX host for ovrtx and CUDA Mitsuba
+- Optional: Blender for the Blender backend
+- Optional: an SSH-accessible Linux CUDA/RTX host for remote Warp, ovrtx, Mitsuba, and
+  Cosmos workflows
 
 ```bash
 git clone https://github.com/tkelestemur/robotic_renderers.git
@@ -257,3 +289,6 @@ Further documentation:
 
 Robotic Renderers is licensed under
 [Apache-2.0](https://github.com/tkelestemur/robotic_renderers/blob/main/LICENSE).
+
+If Robotic Renderers helps your work, consider starring the repository and sharing the
+comparison with other robotics and graphics developers.
