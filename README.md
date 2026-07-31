@@ -9,6 +9,11 @@ scene:
 - NVIDIA ovrtx, in real-time or converged path-traced mode
 - Mitsuba 3 CUDA/OptiX
 
+[![Autoplaying tiled comparison of all five rendering backends](videos/all_tiled_preview.gif)](videos/all_tiled.mp4)
+
+The 30-second preview loops automatically. Select it to open the full-resolution
+3840x1440 comparison video.
+
 Cosmos 3 is available as an optional generative post-process. It is not treated as a
 renderer or a source of simulator ground truth.
 
