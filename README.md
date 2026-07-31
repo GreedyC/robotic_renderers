@@ -36,7 +36,7 @@ two orbits, close inspection passes, establishing views, and changing camera hei
 · [Documentation](docs/)
 · [Architecture](docs/architecture.md)
 · [Renderer parity](docs/backend-parity.md)
-· [Roadmap and feedback](https://github.com/tkelestemur/robotic_renderers/discussions)
+· [Roadmap and feedback](https://github.com/tkelestemur/robotic_renderers/discussions/6)
 
 ## Backend support
 
