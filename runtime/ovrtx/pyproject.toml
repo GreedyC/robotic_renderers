@@ -4,9 +4,9 @@ version = "0.1.0"
 description = "Pinned Linux/RTX runtime for the robotic-renderers ovrtx backend"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-  "numpy==2.5.1",
-  "ovrtx==0.4.0.346409",
-  "ovstage==0.1.0.346039",
+  "numpy==2.5.3",
+  "ovrtx==0.5.0.377615",
+  "ovstage==0.2.0.377349",
 ]
 
 [tool.uv]

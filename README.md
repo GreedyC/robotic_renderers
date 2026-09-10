@@ -83,6 +83,31 @@ separate uv environments and keep downloaded runtimes and caches outside Git.
 Use `uv run robotic-renderers status` after configuring an SSH host to probe all five
 backends.
 
+The dependency refresh uses MuJoCo/MuJoCo Warp 3.13.0, Warp 1.17.0, NumPy 2.5.3,
+pygame-ce 2.5.8, OpenUSD 26.8, ovrtx 0.5.0.377615/ovstage 0.2.0.377349, and
+Mitsuba 3.9.1/Dr.Jit 1.5.0. The main environment and all three remote locks include
+the latest compatible transitive dependencies. The throughput harness downloads
+Blender 5.2.1 LTS with a verified SHA-256; local Blender remains selectable through
+`BLENDER_BIN`. Throughput workers explicitly enable Blender's Python environment
+support for the project source path and fail immediately if they exit before readiness.
+
+ovrtx 0.5 output lookup uses full RenderVar paths for RGB, annotations, and throughput
+readback. Its replacement bounce settings use zero extra specular/transmission
+bounces, following upstream's conversion of the previous limits. The canonical scene
+and camera trajectory are preserved.
+
+Cosmos uses vLLM-Omni 0.28.0's release commit with matching vLLM 0.28.0. Although
+vLLM 0.29.0 is available, Omni requires a matching release line; see the
+[upstream installation guide](https://github.com/vllm-project/vllm-omni/blob/v0.28.0/docs/getting_started/installation/gpu/cuda.inc.md).
+Setup resolves the pair together and rejects an existing runtime with stale versions.
+To upgrade an existing Cosmos service:
+
+```bash
+uv run robotic-renderers cosmos stop --host render-host
+uv run robotic-renderers cosmos setup --host render-host --force
+uv run robotic-renderers cosmos start --host render-host
+```
+
 The FR3 meshes and MJCF are vendored from MuJoCo Menagerie commit
 `71f066ad0be9cd271f7ed58c030243ef157af9f4`. See
 [THIRD_PARTY.md](https://github.com/tkelestemur/robotic_renderers/blob/main/THIRD_PARTY.md)
@@ -274,6 +299,17 @@ uv run pytest -q
 
 Portable CI excludes tests marked `integration`, `gpu`, or `remote`. Renderer changes
 also require a relevant still or short-video smoke test.
+
+For a quick recording check, use three frames at reduced resolution. Check each
+backend separately, then the complete tiled workflow on a configured GPU host:
+
+```bash
+uv run robotic-renderers record --backend opengl --duration 0.5 --fps 6 \
+  --width 320 --height 180 --output outputs/smoke_opengl.mp4
+uv run robotic-renderers record --backend all --host render-host \
+  --duration 0.5 --fps 6 --width 320 --height 180 --samples 4 --supersample 1 \
+  --keep-components --output outputs/smoke_all.mp4
+```
 
 Further documentation:
 

@@ -9,9 +9,10 @@ gpu-selection-environment = "ROBOTIC_RENDERERS_COSMOS_GPU_IDS"
 topology-guidance = "Select GPUs on one NUMA node when possible."
 
 [python-packages]
-vllm = "0.26.0"
+# vLLM-Omni 0.28.0 requires the matching vLLM release line (not vLLM 0.29).
+vllm = "0.28.0"
 vllm-omni-repository = "https://github.com/vllm-project/vllm-omni.git"
-vllm-omni-commit = "39663d52872019fb0eb74bed8f1e811190486b0f"
+vllm-omni-commit = "eb11446b7f2e30ca582f8aff3afe12e9a2e66f6c"
 
 [model]
 repository = "nvidia/Cosmos3-Super"

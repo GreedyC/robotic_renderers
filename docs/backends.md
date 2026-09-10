@@ -53,7 +53,7 @@ deadline, reaps it, and removes its temporary scene.
 ## NVIDIA ovrtx
 
 ovrtx requires Linux, an RTX-capable NVIDIA GPU, and a working SSH host. Setup installs
-the official pinned v0.4 wheels from a frozen uv lock in a dedicated remote environment:
+the official pinned v0.5 wheels from a frozen uv lock in a dedicated remote environment:
 
 ```bash
 uv run robotic-renderers setup --backend ovrtx --host render-host

@@ -7,6 +7,20 @@ use [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Refresh the main and isolated renderer dependency locks, build tools, and CI actions.
+- Upgrade the throughput harness to Blender 5.2.1 LTS with its official archive checksum.
+- Upgrade Cosmos to the vLLM-Omni 0.28.0 release commit and matching vLLM 0.28.0.
+
+### Fixed
+
+- Read ovrtx 0.5 RGB and AOV outputs by full USD path, including throughput workers,
+  and migrate the retired specular/transmission bounce attributes.
+- Resolve the Cosmos package pair together and reject stale existing installations.
+- Let Blender throughput workers import the project through the supplied `PYTHONPATH`
+  and report early worker exits instead of waiting for the readiness deadline.
+
 ## [0.1.0] - 2026-07-31
 
 ### Added

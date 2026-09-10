@@ -313,7 +313,7 @@ def backend_status(host: str = DEFAULT_HOST) -> dict[str, object]:
     return {
         "backend": BACKEND_NAME,
         "available": True,
-        "version": getattr(mjw, "__version__", "3.11.0"),
+        "version": mjw.__version__,
         "device": local_device,
         "execution": "local",
         "live": True,

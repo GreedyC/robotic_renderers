@@ -50,7 +50,7 @@ from robotic_renderers.remote import (
 )
 
 BACKEND_NAME = "mitsuba"
-MITSUBA_VERSION = "3.9.0"
+MITSUBA_VERSION = "3.9.1"
 DEFAULT_HOST = os.environ.get("ROBOT_RENDERING_MITSUBA_HOST", DEFAULT_RENDER_HOST)
 PACKAGE_SOURCE = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = PACKAGE_SOURCE.parents[1]

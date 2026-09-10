@@ -39,8 +39,8 @@ DEFAULT_MODEL_REVISION = os.environ.get(
     "ROBOT_RENDERING_COSMOS_MODEL_REVISION",
     "e0262be9d8f7586bc24c069a2aed2b665bdff266",
 )
-VLLM_VERSION = "0.26.0"
-VLLM_OMNI_COMMIT = "39663d52872019fb0eb74bed8f1e811190486b0f"
+VLLM_VERSION = "0.28.0"
+VLLM_OMNI_COMMIT = "eb11446b7f2e30ca582f8aff3afe12e9a2e66f6c"
 REMOTE_ROOT = "code/robot_rendering_cosmos3"
 DEFAULT_PORT = 8091
 
@@ -149,11 +149,19 @@ if [ ! -x .venv/bin/vllm ]; then
   rm -rf .venv
   "$uv_bin" venv --python 3.12 --managed-python --seed .venv
   "$uv_bin" pip install --python .venv/bin/python --torch-backend=cu130 \
-    {shlex.quote(f"vllm=={VLLM_VERSION}")}
-  "$uv_bin" pip install --python .venv/bin/python --torch-backend=cu130 \
+    {shlex.quote(f"vllm=={VLLM_VERSION}")} \
     {shlex.quote(package)}
 fi
 .venv/bin/python - <<'PY'
+import json
+from importlib.metadata import distribution, version
+
+upgrade = "Stop the Cosmos service and run cosmos setup --force to upgrade its runtime."
+assert version("vllm").split("+")[0] == "{VLLM_VERSION}", upgrade
+omni = distribution("vllm-omni")
+origin = json.loads(omni.read_text("direct_url.json") or "{{}}")
+assert origin.get("vcs_info", {{}}).get("commit_id") == "{VLLM_OMNI_COMMIT}", upgrade
+
 import torch
 import vllm
 import vllm_omni

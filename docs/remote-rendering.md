@@ -40,6 +40,13 @@ The official ovrtx wheel also loads the system OpenGL dispatcher. On Ubuntu 24.0
 sudo apt-get install --no-install-recommends libopengl0
 ```
 
+The first ovrtx render with a fresh shader cache can spend several minutes compiling
+shaders before producing a frame; the 0.5 upgrade smoke test took about 15 minutes on
+an L4. The next short recording completed in about 23 seconds. Preserve the runtime
+and its `ovrtx/bin/cache` directory between jobs so later runs can reuse these shaders.
+Different rendering configurations, including throughput workers, can trigger additional
+shader compilation.
+
 Install uv on a new host using the current instructions from
 [Astral](https://docs.astral.sh/uv/getting-started/installation/). Review installation
 scripts before piping downloaded content into a shell.

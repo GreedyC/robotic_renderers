@@ -10,33 +10,33 @@ supported-markers = [
 
 [[package]]
 name = "drjit"
-version = "1.4.0"
+version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/74/85825b04c3e488663e2c2719f3ce8fc4c3166c1a22e4d0add13738ce3864/drjit-1.4.0-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:3dc38a4b95cf5a5abf6e37702fd928d8aab88165b4ce1101df6bcf5c768792cf", size = 4827004, upload-time = "2026-06-25T21:35:00.639Z" },
-    { url = "https://files.pythonhosted.org/packages/03/48/ec16aefef7d86ae0a25a6c5a00e6fc7a1c9fe28ac50ab07ba24e7e0ea4a7/drjit-1.4.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1cd6ecef40b73b7a77074e70d93c86cc322591651f273c0237c3e76faedafcba", size = 4826452, upload-time = "2026-06-25T21:35:07.998Z" },
+    { url = "https://files.pythonhosted.org/packages/c4/db/fd29fab81172ac464eb8123012835e01a5653b0009996f541d6a602150a5/drjit-1.5.0-cp312-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:4e09b4ca25917a05a59c6e857d2a1cb93ff523afa40556eef2cbabd4f40d05c5", size = 4952960, upload-time = "2026-08-07T07:15:48.349Z" },
+    { url = "https://files.pythonhosted.org/packages/1c/40/49ccee53b8c923053b309cc33cc4eb8fa1146d4ba77e1d47aa9d304861a2/drjit-1.5.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:640a8c607fe48a6f440d346649f1d39e6a0aa579a6f4c782d8451862d0929c04", size = 4954435, upload-time = "2026-08-07T07:15:53.825Z" },
 ]
 
 [[package]]
 name = "mitsuba"
-version = "3.9.0"
+version = "3.9.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "drjit", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "drjit" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cd/d5/f4144fba7fa2c06dafe07fefdc3b85085d71e5bd2fab6c8a81fa9345d1fa/mitsuba-3.9.0-cp312-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:29b034b93d9d2b802fa39ba595a8a87f0b2e8f1ff1bb4a5a64857f38959ce9b0", size = 62636314, upload-time = "2026-06-26T04:02:07.559Z" },
-    { url = "https://files.pythonhosted.org/packages/d4/c7/2b842f711561784108c09efa203cb21e1ba38f2ccea7b9fa701a13a18027/mitsuba-3.9.0-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:be02716b9ce24dd6867baad053abd0928800644c3b217307f6da920feb57e37c", size = 62625609, upload-time = "2026-06-26T04:02:27.03Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/e7/4ddd6ff024d1b07d85c693201ef0e367906fb8c7378ec3508b21b95e3bd3/mitsuba-3.9.1-cp312-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:67d9cea9e0ee75295ad3692ef12360e285e679be01e8ff1997ef4c38925f5a13", size = 62576170, upload-time = "2026-08-07T10:45:12.924Z" },
+    { url = "https://files.pythonhosted.org/packages/93/43/03a84dca9da60dd98cead71f6ce430002d8f6d6e316d812c76017042d121/mitsuba-3.9.1-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:81e4f8eb00e5e95dcea4c3f69439801d4cc43994f061fd3a9f7b3149e492ba55", size = 62564901, upload-time = "2026-08-07T10:45:04.493Z" },
 ]
 
 [[package]]
 name = "numpy"
-version = "2.5.1"
+version = "2.5.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/22/fd/89965aa4ac08c74998539fcbf24fa3540f3e15237fbeb6bcf9c908f4aade/numpy-2.5.1.tar.gz", hash = "sha256:a48a113e6afea91f5608793bafa7ef2ad481fefbda87ec5069f483de61cb9fa3", size = 20755553, upload-time = "2026-07-04T17:08:00.933Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/13/01/11703282db468b85f6f7b8c7f22d058de5970d5c7e60a3a8aaa313c3de36/numpy-2.5.3.tar.gz", hash = "sha256:df2d5874ff183595a4ba404edd04f6bd9b5505c1d7708573f6a6c17489a67563", size = 20791231, upload-time = "2026-09-06T16:27:47.073Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/a9/6e73d68500f80773f65f0654ea932019d6694329a0eb0ed0533de38df376/numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:59fda5e192b570217ec2580c96f00e9a7e12ef6866a900eb089b62c1a32545ca", size = 16672469, upload-time = "2026-07-04T17:06:24.064Z" },
-    { url = "https://files.pythonhosted.org/packages/83/d0/a39b2fbcde9cb17a1dac678f254b33a6336298af9df338824c685425d5e8/numpy-2.5.1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:e824c2acf8862052246be5a44c15da1777940c60d010dd2aab897824d9c430f9", size = 18431940, upload-time = "2026-07-04T17:06:29.521Z" },
+    { url = "https://files.pythonhosted.org/packages/65/af/aa78d1a88805456e212b65461354cd943197fb9acecc4c90fd12295123a3/numpy-2.5.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b7e18c623bb5c95acb3b3328861272816ba199fb531921c5d6d0b675f1fde9e3", size = 16717410, upload-time = "2026-09-06T16:24:42.745Z" },
+    { url = "https://files.pythonhosted.org/packages/62/4a/8877e629445a7176297dffcaf9c485faa96a95d81728a62521ad55bd4c0f/numpy-2.5.3-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:b5d93cf48f687479941d12b69c873ad2cc76bbd487f0091c2200636497f34034", size = 18476479, upload-time = "2026-09-06T16:24:49.35Z" },
 ]
 
 [[package]]
@@ -54,14 +54,14 @@ name = "robotic-renderers-mitsuba-runtime"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "mitsuba", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "numpy", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "pillow", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "mitsuba" },
+    { name = "numpy" },
+    { name = "pillow" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "mitsuba", specifier = "==3.9.0" },
-    { name = "numpy", specifier = ">=2.5.1,<3" },
+    { name = "mitsuba", specifier = "==3.9.1" },
+    { name = "numpy", specifier = ">=2.5.3,<3" },
     { name = "pillow", specifier = ">=12.3,<13" },
 ]

@@ -156,12 +156,12 @@ def test_warp_runtime_is_pinned_and_linux_only():
     assert project["project"]["dependencies"] == [
         "imageio==2.37.4",
         "imageio-ffmpeg==0.6.0",
-        "mujoco==3.11.0",
-        "mujoco-warp==3.11.0",
-        "numpy==2.5.1",
+        "mujoco==3.13.0",
+        "mujoco-warp==3.13.0",
+        "numpy==2.5.3",
         "pillow==12.3.0",
         "usd-core==26.8",
-        "warp-lang==1.15.0",
+        "warp-lang==1.17.0",
     ]
     assert lock["requires-python"] == "==3.12.*"
     assert lock["supported-markers"] == ["platform_machine == 'x86_64' and sys_platform == 'linux'"]

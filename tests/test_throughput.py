@@ -1,5 +1,7 @@
 import json
+import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -69,6 +71,25 @@ def test_ovrtx_multi_environment_stage_preserves_per_environment_resolution(
     assert stage.count("prepend references") == 4
     assert stage.count("</World/Environment_") == 4
     assert "uint[] deviceIds = [0]" in stage
+    assert "int omni:rtx:pt:limits:extraSpecularAndTransmissiveBounces = 0" in stage
+    assert "maxGlossyBounces" not in stage
+
+
+@pytest.mark.parametrize("path", ("/Render/Camera", "/Render/MultiEnvironment"))
+def test_ovrtx_benchmark_maps_full_product_path(monkeypatch, path):
+    released = []
+    mapping = SimpleNamespace(unmap=lambda: released.append(True))
+    frame = SimpleNamespace(
+        render_vars={path + "/LdrColor": SimpleNamespace(map=lambda device: mapping)}
+    )
+    monkeypatch.setitem(sys.modules, "ovrtx", SimpleNamespace(Device=SimpleNamespace(CPU="cpu")))
+    monkeypatch.setattr(np, "from_dlpack", lambda mapping: np.full((2, 3, 4), 7, dtype=np.uint8))
+
+    shapes, checksum = throughput._map_ovrtx_product(SimpleNamespace(frames=[frame]), path)
+
+    assert shapes == [[2, 3, 3]]
+    assert checksum == 21
+    assert released == [True]
 
 
 def test_mitsuba_workers_are_distributed_round_robin_across_selected_gpus():
@@ -76,6 +97,43 @@ def test_mitsuba_workers_are_distributed_round_robin_across_selected_gpus():
 
     with pytest.raises(ValueError, match="At least one GPU"):
         throughput._mitsuba_worker_gpus(1, [])
+
+
+def test_blender_warmup_rejects_successful_exit_without_ready_signal(monkeypatch, tmp_path):
+    commands = []
+    process = SimpleNamespace(poll=lambda: 0, returncode=0)
+    monkeypatch.setattr(
+        throughput.subprocess,
+        "Popen",
+        lambda command, **kwargs: commands.append((command, kwargs)) or process,
+    )
+    # Bound the old failure mode too: it waited until the twenty-minute deadline.
+    times = iter((0.0, 1201.0))
+    monkeypatch.setattr(throughput.time, "monotonic", lambda: next(times))
+    monkeypatch.setenv("PYTHONPATH", str(tmp_path / "source"))
+
+    with pytest.raises(RuntimeError, match="Blender worker failed during warmup"):
+        throughput._blender_trial(
+            tmp_path / "blender",
+            tmp_path / "manifest.json",
+            tmp_path / "work",
+            workers=1,
+            gpus=[0],
+            frames=1,
+            warmup=0,
+            samples=4,
+            gpus_per_worker=1,
+            cpu_threads=1,
+            denoiser="OPTIX",
+            persistent_data=True,
+            max_bounces=12,
+            numa_bind=False,
+        )
+
+    command, options = commands[0]
+    assert "--python-use-system-env" in command
+    assert command[command.index("--python-exit-code") + 1] == "1"
+    assert options["env"]["PYTHONPATH"] == str(tmp_path / "source")
 
 
 def test_mitsuba_guided_denoiser_receives_rgb_albedo_and_normals():

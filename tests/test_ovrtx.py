@@ -221,6 +221,10 @@ def test_ovrtx_realtime_bundle_authors_requested_annotation_aovs(tmp_path: Path)
     assert 'def RenderVar "SemanticIdMap"' in scene
     assert "SemanticsAPI:class" in scene
     assert "SemanticsAPI:label" in scene
+    assert "int omni:rtx:pt:limits:extraSpecularAndTransmissiveBounces = 0" in scene
+    assert scene.count("int omni:rtx:rtpt:extraSpecularAndTransmissiveBounces = 0") == 2
+    assert "maxGlossyBounces" not in scene
+    assert "maxSpecularAndTransmissionBounces" not in scene
 
 
 def test_ovrtx_rejects_unknown_render_modes_and_aovs():
@@ -667,7 +671,7 @@ def test_worker_evaluates_each_authored_usd_frame_before_rendering(monkeypatch):
         assert delta_time == 1.0 / 24.0
         mapping = SimpleNamespace(unmap=lambda: None)
         render_var = SimpleNamespace(map=lambda device: mapping)
-        frame = SimpleNamespace(render_vars={"LdrColor": render_var})
+        frame = SimpleNamespace(render_vars={"/Render/Camera/LdrColor": render_var})
         return {"/Render/Camera": SimpleNamespace(frames=[frame])}
 
     fake_ovrtx = SimpleNamespace(Device=SimpleNamespace(CPU="cpu"))
@@ -709,7 +713,7 @@ def test_worker_advances_ovstage_time_and_renders_at_the_same_ordinal(monkeypatc
         steps.append((render_products, delta_time, ordinal))
         mapping = SimpleNamespace(unmap=lambda: None)
         render_var = SimpleNamespace(map=lambda device: mapping)
-        frame = SimpleNamespace(render_vars={"LdrColor": render_var})
+        frame = SimpleNamespace(render_vars={"/Render/Camera/LdrColor": render_var})
         return {"/Render/Camera": SimpleNamespace(frames=[frame])}
 
     fake_ovrtx = SimpleNamespace(Device=SimpleNamespace(CPU="cpu"))
@@ -747,6 +751,64 @@ def test_worker_advances_ovstage_time_and_renders_at_the_same_ordinal(monkeypatc
     assert advances == [(7, "all")]
     assert waits == [7]
     assert steps == [({"/Render/Camera"}, 1.0 / 24.0, 7)]
+
+
+@pytest.mark.parametrize("render_mode", ("PathTracing", "RealTimePathTracing"))
+def test_worker_maps_rgb_and_annotations_by_full_product_path(monkeypatch, render_mode):
+    arrays = {
+        "/Render/Camera/LdrColor": np.full((2, 3, 4), 101, dtype=np.uint8),
+        "/Render/Annotations/LdrColor": np.full((2, 3, 4), 202, dtype=np.uint8),
+        "/Render/Annotations/DistanceToImagePlaneSD": np.full((2, 3, 1), 2.5),
+        "/Render/Annotations/NormalSD": np.full((2, 3, 4), 0.5),
+        "/Render/Annotations/DiffuseAlbedoSD": np.full((2, 3, 4), 0.25),
+    }
+    unmapped = []
+    steps = []
+
+    def map_output(path, device):
+        assert device == "cpu"
+
+        def unmap():
+            arrays[path].fill(0)
+            unmapped.append(path)
+
+        return SimpleNamespace(array=arrays[path], unmap=unmap)
+
+    def step(*, render_products, delta_time):
+        product = next(iter(render_products))
+        steps.append((product, delta_time))
+        variables = {
+            path: SimpleNamespace(map=lambda device, path=path: map_output(path, device))
+            for path in arrays
+            if path.startswith(product + "/")
+        }
+        return {product: SimpleNamespace(frames=[SimpleNamespace(render_vars=variables)])}
+
+    monkeypatch.setitem(sys.modules, "ovrtx", SimpleNamespace(Device=SimpleNamespace(CPU="cpu")))
+    monkeypatch.setattr(np, "from_dlpack", lambda mapping: mapping.array)
+    bundle = {
+        "animated_in_usd": True,
+        "fps": 24,
+        "height": 2,
+        "width": 3,
+        "render_mode": render_mode,
+        "render_product": "/Render/Camera",
+        "annotation_product": "/Render/Annotations",
+        "aovs": ["depth", "normals", "albedo"],
+        "annotation_render_vars": list(
+            render_ovrtx._requested_render_vars(("depth", "normals", "albedo"))
+        ),
+    }
+    renderer = SimpleNamespace(step=step, update_from_usd_time=lambda time: None)
+
+    result = render_ovrtx._worker_frame(renderer, bundle, {}, index=1)
+
+    np.testing.assert_array_equal(result["rgb"], np.full((2, 3, 3), 101, dtype=np.uint8))
+    np.testing.assert_array_equal(result["depth"], np.full((2, 3), 2.5))
+    np.testing.assert_array_equal(result["normals"], np.full((2, 3, 3), 0.5))
+    np.testing.assert_array_equal(result["albedo"], np.full((2, 3, 3), 0.25))
+    assert set(unmapped) == set(arrays)
+    assert steps == [("/Render/Camera", 1 / 24), ("/Render/Annotations", 1 / 24)]
 
 
 def test_malformed_handshake_does_not_block_and_reaps_stubborn_ssh(monkeypatch):

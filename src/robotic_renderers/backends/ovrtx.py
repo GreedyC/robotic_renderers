@@ -47,8 +47,8 @@ from robotic_renderers.remote import (
 )
 
 BACKEND_NAME = "ovrtx"
-OVRTX_VERSION = "0.4.0.346409"
-OVSTAGE_VERSION = "0.1.0.346039"
+OVRTX_VERSION = "0.5.0.377615"
+OVSTAGE_VERSION = "0.2.0.377349"
 DEFAULT_HOST = os.environ.get("ROBOT_RENDERING_OVRTX_HOST", DEFAULT_RENDER_HOST)
 PACKAGE_SOURCE = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = PACKAGE_SOURCE.parents[1]
@@ -96,7 +96,7 @@ AOV_RENDER_VARS = {
     "normals": ("NormalSD",),
     "albedo": ("DiffuseAlbedoSD",),
     "semantic": ("SemanticSegmentation", "SemanticIdMap"),
-    # ovrtx 0.4 has no native instance render variable. Unique USD ``label``
+    # ovrtx has no native instance render variable. Unique USD ``label``
     # semantics are combined with class semantics in SemanticSegmentation, then
     # remapped below into stable per-geometry instance identifiers.
     "instance": ("SemanticSegmentation", "SemanticIdMap"),
@@ -256,14 +256,14 @@ def backend_status(host: str = DEFAULT_HOST) -> dict[str, object]:
             "semantic": "SemanticSegmentation + SemanticIdMap",
             "instance": (
                 "Derived from SemanticSegmentation using unique authored USD label semantics; "
-                "ovrtx 0.4 has no native instance render variable"
+                "ovrtx has no native instance render variable"
             ),
         },
         "notes": (
             "ovrtx is Linux/Windows RTX-only. The renderer runs on the configured RTX host "
             "while OpenUSD scene generation, live display, and MP4 encoding remain on macOS. "
             "Non-color AOVs are produced by an RTPT annotation RenderProduct because ovrtx "
-            "0.4 PathTracing exposes only LdrColor and HdrColor."
+            "PathTracing exposes only LdrColor and HdrColor."
         ),
         "error": error,
     }
@@ -300,7 +300,7 @@ except OSError as exc:
         "ovrtx requires libOpenGL.so.0; on Ubuntu run: "
         "sudo apt-get install --no-install-recommends libopengl0"
     ) from exc
-assert ovrtx.__version__ == "0.4.0"
+assert ovrtx.__version__ == "0.5.0"
 assert version("ovrtx") == "{OVRTX_VERSION}"
 assert version("ovstage") == "{OVSTAGE_VERSION}"
 PY
@@ -703,7 +703,7 @@ def _annotation_product_usda(
         token omni:rtx:rendermode = "RealTimePathTracing"
         token[] omni:rtx:waitForEvents = ["AllLoadingFinished", "OnlyOnFirstRequest"]
         int omni:rtx:rtpt:maxBounces = 8
-        int omni:rtx:rtpt:maxSpecularAndTransmissionBounces = 8
+        int omni:rtx:rtpt:extraSpecularAndTransmissiveBounces = 0
 {definitions}
     }}
 """
@@ -890,9 +890,9 @@ def Scope "Render" {{
         bool omni:rtx:pt:denoising:enabled = true
         bool omni:rtx:pt:denoising:optix:temporal = false
         int omni:rtx:pt:limits:maxBounces = 12
-        int omni:rtx:pt:limits:maxGlossyBounces = 8
+        int omni:rtx:pt:limits:extraSpecularAndTransmissiveBounces = 0
         int omni:rtx:rtpt:maxBounces = 8
-        int omni:rtx:rtpt:maxSpecularAndTransmissionBounces = 8
+        int omni:rtx:rtpt:extraSpecularAndTransmissiveBounces = 0
         def RenderVar "LdrColor" {{
             string sourceName = "LdrColor"
         }}
@@ -1845,10 +1845,11 @@ def benchmark(
     }
 
 
-def _map_render_var(frame, name: str) -> np.ndarray:
+def _map_render_var(frame, path: str) -> np.ndarray:
     import ovrtx
 
-    mapping = frame.render_vars[name].map(device=ovrtx.Device.CPU)
+    # ovrtx 0.5 keys outputs by RenderVar path, including the owning product.
+    mapping = frame.render_vars[path].map(device=ovrtx.Device.CPU)
     try:
         view = np.from_dlpack(mapping)
         result = np.ascontiguousarray(view).copy()
@@ -1950,7 +1951,7 @@ def _worker_frame(
         time_code = (index + 1) / bundle["fps"]
         if stage is None:
             # Compatibility path retained for isolated tests and ovrtx 0.3
-            # callers. The 0.4 worker uses ovstage below.
+            # callers. The current worker uses ovstage below.
             renderer.update_from_usd_time(time_code)
         elif update_stage:
             import ovstage
@@ -1993,7 +1994,7 @@ def _worker_frame(
         raise RuntimeError("ovrtx returned no camera frame")
     if index == 0:
         print("[robot-rendering] mapping first LdrColor frame", flush=True)
-    ldr_color = _map_render_var(product.frames[0], "LdrColor")
+    ldr_color = _map_render_var(product.frames[0], f"{bundle['render_product']}/LdrColor")
     expected_shape = (bundle["height"], bundle["width"], 4)
     if ldr_color.shape != expected_shape:
         raise RuntimeError(f"ovrtx LdrColor has shape {ldr_color.shape}; expected {expected_shape}")
@@ -2017,7 +2018,8 @@ def _worker_frame(
         raise RuntimeError("ovrtx returned no annotation frame")
     annotation_frame = annotation_product.frames[0]
     mapped = {
-        name: _map_render_var(annotation_frame, name) for name in bundle["annotation_render_vars"]
+        name: _map_render_var(annotation_frame, f"{bundle['annotation_product']}/{name}")
+        for name in bundle["annotation_render_vars"]
     }
     if "depth" in aovs:
         outputs["depth"] = np.ascontiguousarray(mapped["DistanceToImagePlaneSD"][..., 0])

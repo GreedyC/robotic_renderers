@@ -35,10 +35,10 @@ OVRTX_REMOTE_ROOT = "code/robot_rendering_ovrtx"
 MITSUBA_REMOTE_ROOT = "code/robot_rendering_mitsuba"
 THROUGHPUT_MODULE = "robotic_renderers.benchmarks.throughput"
 RESULT_MAGIC = "ROBOT_RENDERING_FPS_RESULT="
-BLENDER_VERSION = "5.1.2"
+BLENDER_VERSION = "5.2.1"
 BLENDER_ARCHIVE = f"blender-{BLENDER_VERSION}-linux-x64.tar.xz"
-BLENDER_URL = "https://mirror.clarkson.edu/blender/release/Blender5.1/" + BLENDER_ARCHIVE
-BLENDER_SHA256 = "aaccb355f50183979b698bcce7467103a76261b5fa59f4972295842662a285fb"
+BLENDER_URL = "https://mirror.blender.org/release/Blender5.2/" + BLENDER_ARCHIVE
+BLENDER_SHA256 = "a31f524fa99a527d3d52b7f5aaa68c34e1a19d5a1c9473f79c5cc610fd5b10e9"
 BLENDER_REMOTE = f".cache/blender/blender-{BLENDER_VERSION}-linux-x64/blender"
 BACKENDS = ("opengl", "warp", "blender", "ovrtx", "mitsuba")
 
@@ -701,6 +701,9 @@ def _blender_trial(
         command = [
             str(blender),
             "--background",
+            "--python-use-system-env",
+            "--python-exit-code",
+            "1",
             "--python",
             str(Path(__file__).resolve()),
             "--",
@@ -751,7 +754,10 @@ def _blender_trial(
             if ready_count == workers:
                 break
             failures = [
-                process.returncode for process in processes if process.poll() not in (None, 0)
+                worker
+                for worker, process in enumerate(processes)
+                if (code := process.poll()) is not None
+                and (code != 0 or not (trial / f"ready_{worker}").is_file())
             ]
             if failures:
                 logs = "\n".join(
@@ -857,7 +863,7 @@ def Scope "Render" {{
         bool omni:rtx:pt:denoising:enabled = true
         bool omni:rtx:pt:denoising:optix:temporal = false
         int omni:rtx:pt:limits:maxBounces = 12
-        int omni:rtx:pt:limits:maxGlossyBounces = 8
+        int omni:rtx:pt:limits:extraSpecularAndTransmissiveBounces = 0
         uint[] deviceIds = [0]
         def RenderVar "LdrColor" {{
             string sourceName = "LdrColor"
@@ -870,14 +876,14 @@ def Scope "Render" {{
     return stage_path, "/Render/MultiEnvironment"
 
 
-def _map_ovrtx_product(product) -> tuple[list[list[int]], int]:
+def _map_ovrtx_product(product, render_product: str) -> tuple[list[list[int]], int]:
     import numpy as np
     import ovrtx
 
     shapes = []
     checksum = 0
     for frame in product.frames:
-        mapping = frame.render_vars["LdrColor"].map(device=ovrtx.Device.CPU)
+        mapping = frame.render_vars[f"{render_product}/LdrColor"].map(device=ovrtx.Device.CPU)
         try:
             view = np.from_dlpack(mapping)
             copied = np.ascontiguousarray(view[:, :, :3]).copy()
@@ -920,7 +926,7 @@ def _ovrtx_process(
         for index in range(warmup):
             renderer.update_from_usd_time((index % bundle["frames"] + 1) / bundle["fps"])
             products = renderer.step(render_products={render_product}, delta_time=1 / bundle["fps"])
-            shapes, value = _map_ovrtx_product(products[render_product])
+            shapes, value = _map_ovrtx_product(products[render_product], render_product)
             checksum ^= value
         queue.put({"ready": True, "gpu": gpu})
         if not start_event.wait(timeout=1200):
@@ -933,7 +939,7 @@ def _ovrtx_process(
             products = renderer.step(render_products={render_product}, delta_time=1 / bundle["fps"])
             render_seconds += time.perf_counter() - started
             started = time.perf_counter()
-            shapes, value = _map_ovrtx_product(products[render_product])
+            shapes, value = _map_ovrtx_product(products[render_product], render_product)
             rgb_seconds += time.perf_counter() - started
             checksum ^= value
         expected_pixels = environments * int(bundle["width"]) * int(bundle["height"])
