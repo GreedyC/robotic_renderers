@@ -21,6 +21,9 @@ environments on a configured Linux RTX host.
 
 ## Making a change
 
+For a new renderer, follow [Adding a backend](docs/adding-a-backend.md) for the
+integration files, functional contract and validation checklist.
+
 1. Open an issue for substantial behavior or architecture changes.
 2. Keep `src/robotic_renderers/scene.py` as the source of truth for renderer-visible
    scene data.

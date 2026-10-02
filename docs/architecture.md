@@ -53,6 +53,9 @@ installed `robotic-renderers` and `robotic-renderers-throughput` commands.
 
 ## Backend contract
 
+[Adding a backend](adding-a-backend.md) walks through registration, translation,
+worker isolation and the tests needed for an adapter.
+
 Adapters expose module-level functions where the operation applies:
 
 - `backend_status`
